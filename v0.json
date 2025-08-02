@@ -1,0 +1,22 @@
+{
+  "name": "bean-stash-chatbox",
+  "version": "1.0.0",
+  "description": "AI chatbox powered by Hack Club AI with Spotify integration",
+  "routes": {
+    "/chat/*": {
+      "static": true,
+      "directory": "/chat"
+    }
+  },
+  "headers": {
+    "/chat/*": {
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "1; mode=block",
+      "Content-Security-Policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://ai.hackclub.com https://accounts.spotify.com https://api.spotify.com https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;"
+    }
+  },
+  "environment": {
+    "SPOTIFY_CLIENT_ID": "29acee31192b49e8a7bc0f3e846e46bf"
+  }
+} 

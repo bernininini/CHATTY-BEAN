@@ -1,0 +1,25 @@
+{
+  "name": "bean-stash-chatbox",
+  "version": "1.0.0",
+  "description": "AI chatbox powered by Hack Club AI with Spotify integration and study timer",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'No build step needed for static site'"
+  },
+  "keywords": [
+    "ai",
+    "chatbox",
+    "spotify",
+    "hack-club",
+    "study-timer",
+    "pomodoro"
+  ],
+  "author": "Bernice",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/bean-stash-chatbox"
+  }
+} 

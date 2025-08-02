@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bean Stash - Spotify Connected</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f6e0b5 0%, #eea990 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .callback-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+        .spotify-icon {
+            color: #1DB954;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #6d5964;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #aa9496;
+            margin-bottom: 20px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(109, 89, 100, 0.3);
+            border-radius: 50%;
+            border-top-color: #6d5964;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="spotify-icon">🎵</div>
+        <h1>Connecting to Spotify...</h1>
+        <p>Please wait while we connect your Spotify account to Bean Stash.</p>
+        <div class="loading"></div>
+    </div>
+
+    <script>
+        // Handle Spotify OAuth callback
+        window.onload = function() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const accessToken = params.get('access_token');
+            const error = params.get('error');
+            
+            if (accessToken) {
+                // Success! Redirect back to main app with token
+                localStorage.setItem('spotify_access_token', accessToken);
+                setTimeout(() => {
+                    window.location.href = '/chat/';
+                }, 2000);
+            } else if (error) {
+                // Error occurred
+                document.querySelector('.callback-container').innerHTML = `
+                    <div class="spotify-icon">❌</div>
+                    <h1>Connection Failed</h1>
+                    <p>Error: ${error}</p>
+                    <button onclick="window.location.href='/chat/'">Back to Bean Stash</button>
+                `;
+            } else {
+                // No token found
+                setTimeout(() => {
+                    window.location.href = '/chat/';
+                }, 2000);
+            }
+        };
+    </script>
+</body>
+</html> 

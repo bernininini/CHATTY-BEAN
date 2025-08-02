@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bean Stash 101 - AI Chatbox</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>CHAT HISTORY</h2>
+            </div>
+            <div class="chat-history" id="chatHistory">
+                <!-- Chat history items will be added here -->
+            </div>
+            <div class="sidebar-footer">
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <h1>BEAN STASH 101</h1>
+                    <div class="time-display" id="timeDisplay">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime">Loading...</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="spotify-btn" onclick="toggleSpotify()" title="Spotify Integration">
+                        <i class="fab fa-spotify"></i>
+                    </button>
+                    <button class="timer-btn" onclick="toggleStudyTimer()" title="Study Timer">
+                        <i class="fas fa-stopwatch"></i>
+                    </button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="settings-btn" onclick="toggleSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h2>Welcome to Bean Stash!</h2>
+                    <p>Your friendly AI assistant powered by Hack Club AI. Ask me anything!</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="ASK BEAN......" 
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spotify Integration Panel -->
+    <div class="spotify-panel" id="spotifyPanel">
+        <div class="spotify-header">
+            <h3><i class="fab fa-spotify"></i> Spotify Integration</h3>
+            <button class="close-btn" onclick="toggleSpotify()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="spotify-content">
+            <div class="spotify-login" id="spotifyLogin">
+                <p>Connect your Spotify account to control music while coding!</p>
+                <button class="spotify-connect-btn" onclick="connectSpotify()">
+                    <i class="fab fa-spotify"></i> Connect Spotify
+                </button>
+            </div>
+            <div class="spotify-player" id="spotifyPlayer" style="display: none;">
+                <div class="now-playing">
+                    <img id="albumArt" src="" alt="Album Art">
+                    <div class="track-info">
+                        <div id="trackName">No track playing</div>
+                        <div id="artistName">Unknown Artist</div>
+                    </div>
+                </div>
+                <div class="spotify-controls">
+                    <button onclick="spotifyPrevious()"><i class="fas fa-step-backward"></i></button>
+                    <button onclick="spotifyPlayPause()" id="playPauseBtn"><i class="fas fa-play"></i></button>
+                    <button onclick="spotifyNext()"><i class="fas fa-step-forward"></i></button>
+                </div>
+                <div class="volume-control">
+                    <i class="fas fa-volume-down"></i>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50" onchange="spotifyVolume(this.value)">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Study Timer Modal -->
+    <div class="modal" id="studyTimerModal">
+        <div class="modal-content timer-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-stopwatch"></i> Study Timer</h3>
+                <button class="close-btn" onclick="toggleStudyTimer()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="timer-display">
+                    <div class="timer-time" id="timerDisplay">25:00</div>
+                    <div class="timer-status" id="timerStatus">Ready to start</div>
+                </div>
+                <div class="timer-controls">
+                    <button class="timer-btn" onclick="startTimer()" id="startTimerBtn">
+                        <i class="fas fa-play"></i> Start
+                    </button>
+                    <button class="timer-btn" onclick="pauseTimer()" id="pauseTimerBtn" style="display: none;">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="timer-btn" onclick="resetTimer()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                <div class="timer-presets">
+                    <button class="preset-btn" onclick="setTimer(25)">Pomodoro (25m)</button>
+                    <button class="preset-btn" onclick="setTimer(45)">Study (45m)</button>
+                    <button class="preset-btn" onclick="setTimer(15)">Break (15m)</button>
+                    <button class="preset-btn" onclick="setTimer(5)">Quick (5m)</button>
+                </div>
+                <div class="timer-settings">
+                    <label>Custom Time (minutes):</label>
+                    <input type="number" id="customTime" min="1" max="120" value="25" onchange="setCustomTimer()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="close-btn" onclick="toggleSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>Theme</label>
+                    <select id="themeSelect" onchange="changeTheme()">
+                        <option value="default">Default</option>
+                        <option value="dark">Dark Mode</option>
+                        <option value="light">Light Mode</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Clear Chat History</label>
+                    <button class="danger-btn" onclick="clearChatHistory()">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
