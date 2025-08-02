@@ -533,9 +533,16 @@ function connectSpotify() {
     
     // Use different redirect URIs for local vs production
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const redirectUri = isLocalhost 
-        ? encodeURIComponent(window.location.origin + '/callback.html')
-        : encodeURIComponent('https://berni.lol/chat/callback.html');
+    const isGitHubPages = window.location.hostname === 'bernininini.github.io';
+    
+    let redirectUri;
+    if (isLocalhost) {
+        redirectUri = encodeURIComponent(window.location.origin + '/callback.html');
+    } else if (isGitHubPages) {
+        redirectUri = encodeURIComponent('https://bernininini.github.io/CHATTY-BEAN/callback.html');
+    } else {
+        redirectUri = encodeURIComponent('https://berni.lol/chat/callback.html');
+    }
     
     const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing';
     
@@ -547,7 +554,13 @@ function connectSpotify() {
         return;
     }
     
-    // Redirect to Spotify OAuth (only in production)
+    // For GitHub Pages, redirect to Spotify OAuth
+    if (isGitHubPages) {
+        window.location.href = authUrl;
+        return;
+    }
+    
+    // For other production environments, redirect to Spotify OAuth
     window.location.href = authUrl;
 }
 
