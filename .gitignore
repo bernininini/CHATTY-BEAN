@@ -1,4 +1,6 @@
-# WakaTime
+   git add .
+   git commit -m "Add music player with lyrics display and login system"
+   git push# WakaTime
 .wakatime.log
 
 # OS generated files

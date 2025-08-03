@@ -628,40 +628,17 @@ function connectSpotify() {
         return;
     }
     
-    // Spotify OAuth URL
-    const clientId = '29acee31192b49e8a7bc0f3e846e46bf';
+    // For demo purposes, show the player interface without OAuth
+    // This avoids the OAuth issues and provides a working demo
+    showSpotifyPlayer();
     
-    // Use different redirect URIs for local vs production
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isGitHubPages = window.location.hostname === 'bernininini.github.io';
+    // Note: For production use, you would need to:
+    // 1. Register your app with Spotify Developer Dashboard
+    // 2. Use proper OAuth flow with response_type=code
+    // 3. Implement server-side token exchange
+    // 4. Use Spotify Web Playback SDK
     
-    let redirectUri;
-    if (isLocalhost) {
-        redirectUri = encodeURIComponent(window.location.origin + '/callback.html');
-    } else if (isGitHubPages) {
-        redirectUri = encodeURIComponent('https://bernininini.github.io/CHATTY-BEAN/callback.html');
-    } else {
-        redirectUri = encodeURIComponent('https://berni.lol/chat/callback.html');
-    }
-    
-    const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing';
-    
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&scope=${scope}`;
-    
-    // For local testing, show demo interface
-    if (isLocalhost) {
-        showSpotifyPlayer();
-        return;
-    }
-    
-    // For GitHub Pages, redirect to Spotify OAuth
-    if (isGitHubPages) {
-        window.location.href = authUrl;
-        return;
-    }
-    
-    // For other production environments, redirect to Spotify OAuth
-    window.location.href = authUrl;
+    console.log('Spotify demo mode activated - showing mock player interface');
 }
 
 function initializeSpotifyPlayer() {
@@ -680,10 +657,21 @@ function showSpotifyPlayer() {
     document.getElementById('spotifyLogin').style.display = 'none';
     document.getElementById('spotifyPlayer').style.display = 'block';
     
-    // Show demo track info
-    document.getElementById('trackName').textContent = 'Demo Track - Bean Stash';
-    document.getElementById('artistName').textContent = 'Hack Club AI';
+    // Show demo track info with better messaging
+    document.getElementById('trackName').textContent = 'Demo Mode - Bean Stash';
+    document.getElementById('artistName').textContent = 'Music Player Demo';
     document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
+    
+    // Add a small note about demo mode
+    const trackInfo = document.querySelector('.track-info');
+    if (trackInfo) {
+        const demoNote = document.createElement('div');
+        demoNote.style.fontSize = '12px';
+        demoNote.style.color = '#1DB954';
+        demoNote.style.marginTop = '5px';
+        demoNote.textContent = 'Demo mode - Use main music player for full features';
+        trackInfo.appendChild(demoNote);
+    }
 }
 
 function spotifyPlayPause() {
