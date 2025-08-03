@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    display: flex;
+    display: none;
     height: 98.5vh;
     max-width: 100vw;
     margin: 0 auto;
@@ -102,6 +102,238 @@ body {
     border-radius: 0 20px 20px 0;
 }
 
+/* Music Player Section */
+.music-player-section {
+    background: linear-gradient(135deg, #6d5964 0%, #aa9496 100%);
+    padding: 20px 30px;
+    border-radius: 0 20px 0 0;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.music-player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.music-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.album-art {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.album-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.play-overlay i {
+    font-size: 24px;
+    color: white;
+}
+
+.album-art:hover .play-overlay {
+    opacity: 1;
+}
+
+.track-details {
+    flex: 1;
+}
+
+.track-details h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.track-details p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #aa6f73 0%, #eea990 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.time-display {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.play-btn {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.play-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.volume-control input[type="range"] {
+    width: 80px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    cursor: pointer;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+}
+
+/* Lyrics Section */
+.lyrics-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.lyrics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lyrics-header:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.lyrics-header h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.toggle-lyrics-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.toggle-lyrics-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-content {
+    padding: 20px;
+    max-height: 120px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.lyrics-content.collapsed {
+    max-height: 0;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
+.lyrics-content p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    text-align: center;
+    font-style: italic;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -167,7 +399,7 @@ body {
     align-items: center;
 }
 
-.spotify-btn, .timer-btn, .fullscreen-btn {
+.music-btn, .spotify-btn, .timer-btn, .fullscreen-btn {
     background: none;
     border: none;
     color: #6d5964;
@@ -176,6 +408,17 @@ body {
     padding: 8px;
     border-radius: 8px;
     transition: all 0.3s ease;
+}
+
+.music-btn.active {
+    background: rgba(170, 111, 115, 0.1);
+    color: #aa6f73;
+}
+
+.music-btn:hover {
+    background: rgba(170, 111, 115, 0.1);
+    color: #aa6f73;
+    transform: scale(1.1);
 }
 
 .spotify-btn:hover {
@@ -868,6 +1111,25 @@ body {
     transform: translateY(-1px);
 }
 
+.logout-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.logout-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -912,6 +1174,21 @@ body {
     .message-content {
         max-width: 85%;
     }
+    
+    .music-player {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .music-info {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .music-controls {
+        justify-content: center;
+    }
 }
 
 /* Scrollbar Styling */
@@ -931,4 +1208,109 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(109, 89, 100, 0.5);
+} 
+
+/* Login Modal Styles */
+.login-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-form {
+    padding: 20px 0;
+}
+
+.login-form .welcome-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #aa6f73;
+}
+
+.login-form h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #6d5964;
+    margin-bottom: 10px;
+}
+
+.login-form p {
+    font-size: 16px;
+    color: #aa9496;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    color: #6d5964;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid rgba(109, 89, 100, 0.1);
+    border-radius: 12px;
+    background: white;
+    color: #6d5964;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #6d5964;
+    box-shadow: 0 0 0 3px rgba(109, 89, 100, 0.1);
+}
+
+.login-btn {
+    background: linear-gradient(135deg, #6d5964 0%, #aa9496 100%);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(109, 89, 100, 0.3);
+}
+
+.demo-note {
+    background: rgba(170, 111, 115, 0.1);
+    border: 1px solid rgba(170, 111, 115, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 20px;
+}
+
+.demo-note p {
+    margin: 0;
+    font-size: 14px;
+    color: #aa6f73;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.demo-note i {
+    font-size: 16px;
 } 

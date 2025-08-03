@@ -3,14 +3,73 @@ let currentChatId = null;
 let chatHistory = [];
 let isTyping = false;
 let sessionStartTime = new Date();
+let isLoggedIn = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     loadChatHistory();
     setupEventListeners();
-    focusInput();
     startTimeUpdate();
+    
+    // Check if user is already logged in
+    const savedLogin = localStorage.getItem('bean_stash_login');
+    if (savedLogin) {
+        isLoggedIn = true;
+        hideLoginModal();
+        showMainInterface();
+    }
+    
+    // Add click event for album art play overlay
+    const playOverlay = document.getElementById('playOverlay');
+    if (playOverlay) {
+        playOverlay.addEventListener('click', togglePlayPause);
+    }
+    
+    // Load theme and request notification permission
+    loadTheme();
+    requestNotificationPermission();
 });
+
+// Login function
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    // Simple demo login - accept any non-empty credentials
+    if (username.trim() && password.trim()) {
+        isLoggedIn = true;
+        localStorage.setItem('bean_stash_login', 'true');
+        hideLoginModal();
+        showMainInterface();
+        
+        // Show welcome message
+        setTimeout(() => {
+            addMessageToChat('assistant', `Welcome back, ${username}! 🎵 I've enabled the music player for you. Click the music button in the header to start listening to some tunes while we chat!`);
+        }, 500);
+    } else {
+        alert('Please enter both username and password');
+    }
+}
+
+// Hide login modal
+function hideLoginModal() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Show main interface
+function showMainInterface() {
+    const container = document.querySelector('.container');
+    if (container) {
+        container.style.display = 'flex';
+    }
+    
+    // Focus the input field
+    focusInput();
+}
 
 // Setup event listeners
 function setupEventListeners() {
@@ -376,6 +435,47 @@ function toggleSettings() {
     }
 }
 
+// Logout function
+function logout() {
+    isLoggedIn = false;
+    localStorage.removeItem('bean_stash_login');
+    
+    // Hide main interface
+    const container = document.querySelector('.container');
+    if (container) {
+        container.style.display = 'none';
+    }
+    
+    // Show login modal
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Stop music if playing
+    if (currentAudio && isPlaying) {
+        currentAudio.pause();
+        isPlaying = false;
+        updatePlayButton();
+    }
+    
+    // Hide music player
+    const musicSection = document.getElementById('musicPlayerSection');
+    if (musicSection) {
+        musicSection.style.display = 'none';
+    }
+    
+    // Reset music button
+    const musicBtn = document.getElementById('musicBtn');
+    if (musicBtn) {
+        musicBtn.classList.remove('active');
+    }
+    
+    // Close settings modal
+    toggleSettings();
+}
+
 // Change theme
 function changeTheme() {
     const themeSelect = document.getElementById('themeSelect');
@@ -731,8 +831,185 @@ function requestNotificationPermission() {
     }
 }
 
-// Load theme on page load
+// Music Player Functionality
+let currentAudio = null;
+let isPlaying = false;
+let currentTrackIndex = 0;
+let isMusicPlayerVisible = false;
+let isLyricsCollapsed = false;
+
+// Sample music data with lyrics
+const musicLibrary = [
+    {
+        title: "Bean Stash Theme",
+        artist: "Hack Club AI",
+        albumArt: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjNkQ1OTY0Ii8+CjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjIwIiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSIxMCIgZmlsbD0iIzZENjk2NCIvPgo8L3N2Zz4K",
+        audioUrl: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+        lyrics: "Welcome to Bean Stash\nYour friendly AI assistant\nPowered by Hack Club AI\nAsk me anything you want to know\n\nI'm here to help you learn\nAnd make your day a little better\nSo let's start chatting\nAnd see where our conversation goes"
+    },
+    {
+        title: "Coffee Break",
+        artist: "Bean Stash",
+        albumArt: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjQUE5NDk2Ii8+CjxwYXRoIGQ9Ik0yMCAyMGg0MHY0MEgyMHoiIGZpbGw9IiNFRkE5OTAiLz4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iOCIgZmlsbD0iIzZENjk2NCIvPgo8L3N2Zz4K",
+        audioUrl: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+        lyrics: "Time for a coffee break\nTake a moment to relax\nLet your mind wander\nAnd enjoy this peaceful time\n\nBrew yourself a cup\nOf your favorite blend\nAnd let the aroma\nFill your senses with joy"
+    },
+    {
+        title: "Study Session",
+        artist: "Bean Stash",
+        albumArt: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjNkQ1OTY0Ii8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzAgMzBoMjB2M0gzMHoiIGZpbGw9IiM2RDY5NjQiLz4KPC9zdmc+Cg==",
+        audioUrl: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+        lyrics: "Focus on your studies\nLet knowledge flow through you\nEvery page you turn\nBrings you closer to your goals\n\nStay determined and strong\nYour future is bright ahead\nKeep learning and growing\nYou're doing amazing things"
+    }
+];
+
+// Toggle music player visibility
+function toggleMusicPlayer() {
+    const musicSection = document.getElementById('musicPlayerSection');
+    const musicBtn = document.getElementById('musicBtn');
+    
+    isMusicPlayerVisible = !isMusicPlayerVisible;
+    
+    if (isMusicPlayerVisible) {
+        musicSection.style.display = 'block';
+        musicBtn.classList.add('active');
+        loadCurrentTrack();
+    } else {
+        musicSection.style.display = 'none';
+        musicBtn.classList.remove('active');
+        if (currentAudio) {
+            currentAudio.pause();
+            isPlaying = false;
+            updatePlayButton();
+        }
+    }
+}
+
+// Load current track
+function loadCurrentTrack() {
+    const track = musicLibrary[currentTrackIndex];
+    
+    document.getElementById('musicTrackName').textContent = track.title;
+    document.getElementById('musicArtistName').textContent = track.artist;
+    document.getElementById('musicAlbumArt').src = track.albumArt;
+    document.getElementById('currentLyrics').textContent = track.lyrics;
+    
+    // Create audio element
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
+    currentAudio = new Audio(track.audioUrl);
+    currentAudio.volume = document.getElementById('mainVolumeSlider').value / 100;
+    
+    // Set up audio event listeners
+    currentAudio.addEventListener('loadedmetadata', function() {
+        document.getElementById('totalTimeDisplay').textContent = formatTime(currentAudio.duration);
+    });
+    
+    currentAudio.addEventListener('timeupdate', function() {
+        const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('currentTimeDisplay').textContent = formatTime(currentAudio.currentTime);
+    });
+    
+    currentAudio.addEventListener('ended', function() {
+        nextTrack();
+    });
+    
+    isPlaying = false;
+    updatePlayButton();
+}
+
+// Toggle play/pause
+function togglePlayPause() {
+    if (!currentAudio) return;
+    
+    if (isPlaying) {
+        currentAudio.pause();
+        isPlaying = false;
+    } else {
+        currentAudio.play();
+        isPlaying = true;
+    }
+    
+    updatePlayButton();
+}
+
+// Update play button icon
+function updatePlayButton() {
+    const playBtn = document.getElementById('mainPlayBtn');
+    const playOverlay = document.getElementById('playOverlay');
+    const icon = playBtn.querySelector('i');
+    const overlayIcon = playOverlay.querySelector('i');
+    
+    if (isPlaying) {
+        icon.className = 'fas fa-pause';
+        overlayIcon.className = 'fas fa-pause';
+    } else {
+        icon.className = 'fas fa-play';
+        overlayIcon.className = 'fas fa-play';
+    }
+}
+
+// Previous track
+function previousTrack() {
+    currentTrackIndex = (currentTrackIndex - 1 + musicLibrary.length) % musicLibrary.length;
+    loadCurrentTrack();
+    if (isPlaying) {
+        currentAudio.play();
+    }
+}
+
+// Next track
+function nextTrack() {
+    currentTrackIndex = (currentTrackIndex + 1) % musicLibrary.length;
+    loadCurrentTrack();
+    if (isPlaying) {
+        currentAudio.play();
+    }
+}
+
+// Set volume
+function setVolume(value) {
+    if (currentAudio) {
+        currentAudio.volume = value / 100;
+    }
+}
+
+// Toggle lyrics visibility
+function toggleLyrics() {
+    const lyricsContent = document.getElementById('lyricsContent');
+    const toggleBtn = document.getElementById('toggleLyricsBtn');
+    const icon = toggleBtn.querySelector('i');
+    
+    isLyricsCollapsed = !isLyricsCollapsed;
+    
+    if (isLyricsCollapsed) {
+        lyricsContent.classList.add('collapsed');
+        icon.className = 'fas fa-chevron-down';
+    } else {
+        lyricsContent.classList.remove('collapsed');
+        icon.className = 'fas fa-chevron-up';
+    }
+}
+
+// Format time for display
+function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Initialize music player when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Add click event for album art play overlay
+    document.getElementById('playOverlay').addEventListener('click', togglePlayPause);
+    
+    // Load theme and request notification permission
     loadTheme();
     requestNotificationPermission();
 }); 

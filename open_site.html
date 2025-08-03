@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open Bean Stash Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #6d5964 0%, #aa9496 100%);
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .btn {
+            background: white;
+            color: #6d5964;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Bean Stash Music Player</h1>
+        <p>Your site is ready! Here's how to open it:</p>
+        
+        <div class="instructions">
+            <h3>Method 1: Direct File Opening</h3>
+            <ol>
+                <li>Open <strong>Finder</strong></li>
+                <li>Navigate to your project folder: <code>/Users/berniceqiu/Documents/GitHub/CHATTY-BEAN</code></li>
+                <li>Double-click on <strong>index.html</strong></li>
+                <li>It will open in your default browser</li>
+            </ol>
+        </div>
+        
+        <a href="file:///Users/berniceqiu/Documents/GitHub/CHATTY-BEAN/index.html" class="btn">
+            🚀 Open Site Now
+        </a>
+        
+        <div class="instructions">
+            <h3>Method 2: Install Developer Tools (For Future Use)</h3>
+            <ol>
+                <li>Open <strong>Terminal</strong></li>
+                <li>Run: <code>xcode-select --install</code></li>
+                <li>Follow the installation prompts</li>
+                <li>After installation, you can use: <code>python3 -m http.server 8000</code></li>
+            </ol>
+        </div>
+        
+        <p><strong>Note:</strong> The music player features are fully functional when opened directly!</p>
+    </div>
+</body>
+</html> 

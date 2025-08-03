@@ -9,6 +9,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Login Modal -->
+    <div class="modal active" id="loginModal">
+        <div class="modal-content login-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-coffee"></i> Welcome to Bean Stash</h3>
+            </div>
+            <div class="modal-body">
+                <div class="login-form">
+                    <div class="welcome-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h2>Bean Stash 101</h2>
+                    <p>Your friendly AI assistant with music</p>
+                    
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Enter your username" value="user">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" value="password">
+                    </div>
+                    
+                    <button class="login-btn" onclick="login()">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    
+                    <div class="demo-note">
+                        <p><i class="fas fa-info-circle"></i> Demo: Use any username/password</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Left Sidebar -->
         <div class="sidebar">
@@ -25,8 +61,58 @@
             </div>
         </div>
 
-        <!-- Main Chat Area -->
+        <!-- Main Content -->
         <div class="main-content">
+            <!-- Music Player Section -->
+            <div class="music-player-section" id="musicPlayerSection" style="display: none;">
+                <div class="music-player">
+                    <div class="music-info">
+                        <div class="album-art">
+                            <img id="musicAlbumArt" src="" alt="Album Art">
+                            <div class="play-overlay" id="playOverlay">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="track-details">
+                            <h3 id="musicTrackName">No track playing</h3>
+                            <p id="musicArtistName">Unknown Artist</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                                <span class="time-display" id="currentTimeDisplay">0:00</span>
+                                <span class="time-display" id="totalTimeDisplay">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="music-controls">
+                        <button class="control-btn" onclick="previousTrack()" title="Previous">
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button class="control-btn play-btn" onclick="togglePlayPause()" id="mainPlayBtn" title="Play/Pause">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="control-btn" onclick="nextTrack()" title="Next">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-down"></i>
+                            <input type="range" id="mainVolumeSlider" min="0" max="100" value="50" onchange="setVolume(this.value)">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="lyrics-section">
+                    <div class="lyrics-header">
+                        <h4><i class="fas fa-music"></i> Lyrics</h4>
+                        <button class="toggle-lyrics-btn" onclick="toggleLyrics()" id="toggleLyricsBtn">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="lyrics-content" id="lyricsContent">
+                        <p id="currentLyrics">No lyrics available</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Header -->
             <div class="header">
                 <div class="header-left">
@@ -37,6 +123,9 @@
                     </div>
                 </div>
                 <div class="header-actions">
+                    <button class="music-btn" onclick="toggleMusicPlayer()" title="Music Player" id="musicBtn">
+                        <i class="fas fa-music"></i>
+                    </button>
                     <button class="spotify-btn" onclick="toggleSpotify()" title="Spotify Integration">
                         <i class="fab fa-spotify"></i>
                     </button>
@@ -177,6 +266,12 @@
                 <div class="setting-item">
                     <label>Clear Chat History</label>
                     <button class="danger-btn" onclick="clearChatHistory()">Clear All</button>
+                </div>
+                <div class="setting-item">
+                    <label>Account</label>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
             </div>
         </div>
