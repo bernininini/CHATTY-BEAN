@@ -146,13 +146,15 @@
         </div>
         <div class="spotify-content">
             <div class="spotify-login" id="spotifyLogin">
-                <p>🎵 <strong>Connect Your Spotify Account</strong></p>
-                <p>Link your Spotify account to play your own music while chatting with Bean Stash!</p>
+                <p>🎵 <strong>Spotify Integration Demo</strong></p>
+                <p>Your Spotify app is properly configured! However, full OAuth integration requires a backend server for security.</p>
                 <button class="spotify-connect-btn" onclick="connectSpotify()">
-                    <i class="fab fa-spotify"></i> Connect Spotify Account
+                    <i class="fab fa-spotify"></i> Try Demo Mode
                 </button>
                 <div class="spotify-info">
-                    <p><i class="fas fa-info-circle"></i> This will open Spotify's authorization page. Your music will be controlled from this site.</p>
+                    <p><i class="fas fa-info-circle"></i> <strong>Current Status:</strong> Demo mode active</p>
+                    <p><i class="fas fa-music"></i> <strong>Alternative:</strong> Use the main music player (🎵 button) for sample tracks</p>
+                    <p><i class="fas fa-server"></i> <strong>For Production:</strong> Requires server-side OAuth implementation</p>
                 </div>
             </div>
             <div class="spotify-player" id="spotifyPlayer" style="display: none;">

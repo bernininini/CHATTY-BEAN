@@ -588,29 +588,41 @@ function connectSpotify() {
         return;
     }
     
-    // Spotify OAuth URL for real Spotify connection
-    const clientId = '29acee31192b49e8a7bc0f3e846e46bf';
+    // For now, show a demo mode since OAuth requires a server
+    // In production, you would need a backend server to handle the authorization code flow
+    showSpotifyDemoMode();
     
-    // Use different redirect URIs for local vs production
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isGitHubPages = window.location.hostname === 'bernininini.github.io';
+    console.log('Spotify demo mode - OAuth requires server-side implementation for production');
+}
+
+function showSpotifyDemoMode() {
+    document.getElementById('spotifyLogin').style.display = 'none';
+    document.getElementById('spotifyPlayer').style.display = 'block';
     
-    let redirectUri;
-    if (isLocalhost) {
-        redirectUri = encodeURIComponent(window.location.origin + '/callback.html');
-    } else if (isGitHubPages) {
-        redirectUri = encodeURIComponent('https://bernininini.github.io/CHATTY-BEAN/callback.html');
-    } else {
-        redirectUri = encodeURIComponent('https://berni.lol/chat/callback.html');
+    // Show demo mode with instructions
+    document.getElementById('trackName').textContent = 'Demo Mode - Spotify Integration';
+    document.getElementById('artistName').textContent = 'OAuth requires server implementation';
+    document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNjc3Njc2Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjNjc3Njc2Ii8+Cjwvc3ZnPgo=';
+    
+    // Add demo note
+    const trackInfo = document.querySelector('.track-info');
+    if (trackInfo) {
+        const demoNote = document.createElement('div');
+        demoNote.style.fontSize = '12px';
+        demoNote.style.color = '#1DB954';
+        demoNote.style.marginTop = '5px';
+        demoNote.style.padding = '8px';
+        demoNote.style.background = 'rgba(29, 185, 84, 0.1)';
+        demoNote.style.borderRadius = '6px';
+        demoNote.style.border = '1px solid rgba(29, 185, 84, 0.2)';
+        demoNote.innerHTML = `
+            <strong>Demo Mode</strong><br>
+            • Use the main music player (🎵 button) for sample tracks<br>
+            • Full Spotify integration requires server-side OAuth<br>
+            • Your Spotify app is properly configured!
+        `;
+        trackInfo.appendChild(demoNote);
     }
-    
-    const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-private user-read-email';
-    
-    // Use implicit grant flow for client-side apps
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&scope=${scope}&show_dialog=true`;
-    
-    // Redirect to Spotify OAuth
-    window.location.href = authUrl;
 }
 
 function initializeSpotifyPlayer() {
@@ -691,7 +703,7 @@ function updateSpotifyDisplay(track, isPlaying, progressMs) {
         if (track.album && track.album.images && track.album.images.length > 0) {
             albumArtElement.src = track.album.images[0].url;
         } else {
-            albumArtElement.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
+            albumArtElement.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNjc3Njc2Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjNjc3Njc2Ii8+Cjwvc3ZnPgo=';
         }
         
         // Update play/pause button
