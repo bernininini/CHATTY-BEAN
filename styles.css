@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    display: none;
+    display: flex;
     height: 98.5vh;
     max-width: 100vw;
     margin: 0 auto;
@@ -471,6 +471,28 @@ body {
     opacity: 0.8;
 }
 
+.music-prompt {
+    background: rgba(170, 111, 115, 0.1);
+    border: 1px solid rgba(170, 111, 115, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.music-prompt p {
+    margin: 0;
+    font-size: 14px;
+    color: #aa6f73;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.music-prompt i {
+    font-size: 16px;
+}
+
 /* Message Styles */
 .message {
     margin-bottom: 20px;
@@ -826,6 +848,27 @@ body {
 .spotify-connect-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+
+.spotify-info {
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid rgba(29, 185, 84, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 15px;
+}
+
+.spotify-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #1DB954;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.spotify-info i {
+    font-size: 14px;
 }
 
 .now-playing {

@@ -3,21 +3,13 @@ let currentChatId = null;
 let chatHistory = [];
 let isTyping = false;
 let sessionStartTime = new Date();
-let isLoggedIn = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     loadChatHistory();
     setupEventListeners();
+    focusInput();
     startTimeUpdate();
-    
-    // Check if user is already logged in
-    const savedLogin = localStorage.getItem('bean_stash_login');
-    if (savedLogin) {
-        isLoggedIn = true;
-        hideLoginModal();
-        showMainInterface();
-    }
     
     // Add click event for album art play overlay
     const playOverlay = document.getElementById('playOverlay');
@@ -29,47 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     loadTheme();
     requestNotificationPermission();
 });
-
-// Login function
-function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    // Simple demo login - accept any non-empty credentials
-    if (username.trim() && password.trim()) {
-        isLoggedIn = true;
-        localStorage.setItem('bean_stash_login', 'true');
-        hideLoginModal();
-        showMainInterface();
-        
-        // Show welcome message
-        setTimeout(() => {
-            addMessageToChat('assistant', `Welcome back, ${username}! 🎵 I've enabled the music player for you. Click the music button in the header to start listening to some tunes while we chat!`);
-        }, 500);
-    } else {
-        alert('Please enter both username and password');
-    }
-}
-
-// Hide login modal
-function hideLoginModal() {
-    const loginModal = document.getElementById('loginModal');
-    if (loginModal) {
-        loginModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-}
-
-// Show main interface
-function showMainInterface() {
-    const container = document.querySelector('.container');
-    if (container) {
-        container.style.display = 'flex';
-    }
-    
-    // Focus the input field
-    focusInput();
-}
 
 // Setup event listeners
 function setupEventListeners() {
@@ -437,8 +388,8 @@ function toggleSettings() {
 
 // Logout function
 function logout() {
-    isLoggedIn = false;
-    localStorage.removeItem('bean_stash_login');
+    // isLoggedIn = false; // Removed login state
+    // localStorage.removeItem('bean_stash_login'); // Removed login state
     
     // Hide main interface
     const container = document.querySelector('.container');
@@ -628,17 +579,29 @@ function connectSpotify() {
         return;
     }
     
-    // For demo purposes, show the player interface without OAuth
-    // This avoids the OAuth issues and provides a working demo
-    showSpotifyPlayer();
+    // Spotify OAuth URL for real Spotify connection
+    const clientId = '29acee31192b49e8a7bc0f3e846e46bf';
     
-    // Note: For production use, you would need to:
-    // 1. Register your app with Spotify Developer Dashboard
-    // 2. Use proper OAuth flow with response_type=code
-    // 3. Implement server-side token exchange
-    // 4. Use Spotify Web Playback SDK
+    // Use different redirect URIs for local vs production
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isGitHubPages = window.location.hostname === 'bernininini.github.io';
     
-    console.log('Spotify demo mode activated - showing mock player interface');
+    let redirectUri;
+    if (isLocalhost) {
+        redirectUri = encodeURIComponent(window.location.origin + '/callback.html');
+    } else if (isGitHubPages) {
+        redirectUri = encodeURIComponent('https://bernininini.github.io/CHATTY-BEAN/callback.html');
+    } else {
+        redirectUri = encodeURIComponent('https://berni.lol/chat/callback.html');
+    }
+    
+    const scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-private user-read-email';
+    
+    // Use implicit grant flow for client-side apps
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&scope=${scope}&show_dialog=true`;
+    
+    // Redirect to Spotify OAuth
+    window.location.href = authUrl;
 }
 
 function initializeSpotifyPlayer() {
@@ -657,20 +620,27 @@ function showSpotifyPlayer() {
     document.getElementById('spotifyLogin').style.display = 'none';
     document.getElementById('spotifyPlayer').style.display = 'block';
     
-    // Show demo track info with better messaging
-    document.getElementById('trackName').textContent = 'Demo Mode - Bean Stash';
-    document.getElementById('artistName').textContent = 'Music Player Demo';
-    document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
-    
-    // Add a small note about demo mode
-    const trackInfo = document.querySelector('.track-info');
-    if (trackInfo) {
-        const demoNote = document.createElement('div');
-        demoNote.style.fontSize = '12px';
-        demoNote.style.color = '#1DB954';
-        demoNote.style.marginTop = '5px';
-        demoNote.textContent = 'Demo mode - Use main music player for full features';
-        trackInfo.appendChild(demoNote);
+    if (spotifyAccessToken) {
+        // Show connected status
+        document.getElementById('trackName').textContent = 'Connected to Spotify';
+        document.getElementById('artistName').textContent = 'Your music is ready to play';
+        document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
+        
+        // Add connection status
+        const trackInfo = document.querySelector('.track-info');
+        if (trackInfo) {
+            const statusNote = document.createElement('div');
+            statusNote.style.fontSize = '12px';
+            statusNote.style.color = '#1DB954';
+            statusNote.style.marginTop = '5px';
+            statusNote.textContent = '✅ Connected - Use your Spotify app to control playback';
+            trackInfo.appendChild(statusNote);
+        }
+    } else {
+        // Show not connected status
+        document.getElementById('trackName').textContent = 'Not Connected';
+        document.getElementById('artistName').textContent = 'Click "Connect Spotify Account" to start';
+        document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNjc3Njc2Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjNjc3Njc2Ii8+Cjwvc3ZnPgo=';
     }
 }
 

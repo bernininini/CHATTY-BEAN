@@ -9,42 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Login Modal -->
-    <div class="modal active" id="loginModal">
-        <div class="modal-content login-modal">
-            <div class="modal-header">
-                <h3><i class="fas fa-coffee"></i> Welcome to Bean Stash</h3>
-            </div>
-            <div class="modal-body">
-                <div class="login-form">
-                    <div class="welcome-icon">
-                        <i class="fas fa-coffee"></i>
-                    </div>
-                    <h2>Bean Stash 101</h2>
-                    <p>Your friendly AI assistant with music</p>
-                    
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" placeholder="Enter your username" value="user">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" placeholder="Enter your password" value="password">
-                    </div>
-                    
-                    <button class="login-btn" onclick="login()">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
-                    
-                    <div class="demo-note">
-                        <p><i class="fas fa-info-circle"></i> Demo: Use any username/password</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="container">
         <!-- Left Sidebar -->
         <div class="sidebar">
@@ -126,7 +90,7 @@
                     <button class="music-btn" onclick="toggleMusicPlayer()" title="Music Player" id="musicBtn">
                         <i class="fas fa-music"></i>
                     </button>
-                    <button class="spotify-btn" onclick="toggleSpotify()" title="Spotify Integration">
+                    <button class="spotify-btn" onclick="toggleSpotify()" title="Connect Spotify">
                         <i class="fab fa-spotify"></i>
                     </button>
                     <button class="timer-btn" onclick="toggleStudyTimer()" title="Study Timer">
@@ -149,6 +113,9 @@
                     </div>
                     <h2>Welcome to Bean Stash!</h2>
                     <p>Your friendly AI assistant powered by Hack Club AI. Ask me anything!</p>
+                    <div class="music-prompt">
+                        <p><i class="fas fa-music"></i> <strong>Tip:</strong> Click the music button (🎵) to start listening to music while we chat!</p>
+                    </div>
                 </div>
             </div>
 
@@ -172,18 +139,21 @@
     <!-- Spotify Integration Panel -->
     <div class="spotify-panel" id="spotifyPanel">
         <div class="spotify-header">
-            <h3><i class="fab fa-spotify"></i> Spotify Integration</h3>
+            <h3><i class="fab fa-spotify"></i> Connect Your Spotify</h3>
             <button class="close-btn" onclick="toggleSpotify()">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="spotify-content">
             <div class="spotify-login" id="spotifyLogin">
-                <p>🎵 <strong>Music Player Demo</strong></p>
-                <p>This is a demo of the Spotify integration. For the full music experience, use the main music player (🎵 button in header).</p>
+                <p>🎵 <strong>Connect Your Spotify Account</strong></p>
+                <p>Link your Spotify account to play your own music while chatting with Bean Stash!</p>
                 <button class="spotify-connect-btn" onclick="connectSpotify()">
-                    <i class="fab fa-spotify"></i> Try Demo
+                    <i class="fab fa-spotify"></i> Connect Spotify Account
                 </button>
+                <div class="spotify-info">
+                    <p><i class="fas fa-info-circle"></i> This will open Spotify's authorization page. Your music will be controlled from this site.</p>
+                </div>
             </div>
             <div class="spotify-player" id="spotifyPlayer" style="display: none;">
                 <div class="now-playing">
@@ -267,12 +237,6 @@
                 <div class="setting-item">
                     <label>Clear Chat History</label>
                     <button class="danger-btn" onclick="clearChatHistory()">Clear All</button>
-                </div>
-                <div class="setting-item">
-                    <label>Account</label>
-                    <button class="logout-btn" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
                 </div>
             </div>
         </div>
