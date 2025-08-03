@@ -70,7 +70,7 @@
                 // Success! Redirect back to main app with token
                 localStorage.setItem('spotify_access_token', accessToken);
                 setTimeout(() => {
-                    window.location.href = '/chat/';
+                    window.location.href = 'https://bernininini.github.io/CHATTY-BEAN/';
                 }, 2000);
             } else if (error) {
                 // Error occurred
@@ -78,12 +78,12 @@
                     <div class="spotify-icon">❌</div>
                     <h1>Connection Failed</h1>
                     <p>Error: ${error}</p>
-                    <button onclick="window.location.href='/chat/'">Back to Bean Stash</button>
+                    <button onclick="window.location.href='https://bernininini.github.io/CHATTY-BEAN/'">Back to Bean Stash</button>
                 `;
             } else {
                 // No token found
                 setTimeout(() => {
-                    window.location.href = '/chat/';
+                    window.location.href = 'https://bernininini.github.io/CHATTY-BEAN/';
                 }, 2000);
             }
         };

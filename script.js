@@ -595,6 +595,9 @@ function connectSpotify() {
     // - Firebase Functions
     // - AWS Lambda
     
+    // The correct redirect URI for your GitHub Pages site:
+    // https://bernininini.github.io/CHATTY-BEAN/callback.html
+    
     showSpotifyDemoWithInstructions();
 }
 
@@ -650,7 +653,8 @@ function showSpotifyDemoWithInstructions() {
             <strong>To enable full OAuth:</strong><br>
             • Deploy a simple backend (Node.js/Python)<br>
             • Use your Client Secret: 45c8ea53b09e460095b1b16d7c9118ae<br>
-            • Handle authorization code flow<br><br>
+            • Handle authorization code flow<br>
+            • Ensure redirect URI matches exactly<br><br>
             <strong>Current Status:</strong> Demo mode with sample tracks
         `;
         trackInfo.appendChild(instructionsNote);
