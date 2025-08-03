@@ -544,6 +544,7 @@ function updateTime() {
 // Spotify Integration
 let spotifyAccessToken = null;
 let spotifyPlayer = null;
+let spotifyRefreshInterval = null;
 
 function toggleSpotify() {
     const panel = document.getElementById('spotifyPanel');
@@ -551,8 +552,14 @@ function toggleSpotify() {
     
     if (panel.classList.contains('active')) {
         document.body.style.overflow = 'hidden';
+        // Start polling for currently playing track if connected
+        if (spotifyAccessToken) {
+            startSpotifyPolling();
+        }
     } else {
         document.body.style.overflow = '';
+        // Stop polling when panel is closed
+        stopSpotifyPolling();
     }
 }
 
@@ -563,6 +570,7 @@ function connectSpotify() {
         spotifyAccessToken = storedToken;
         initializeSpotifyPlayer();
         showSpotifyPlayer();
+        startSpotifyPolling();
         return;
     }
     
@@ -576,6 +584,7 @@ function connectSpotify() {
         localStorage.setItem('spotify_access_token', accessToken);
         initializeSpotifyPlayer();
         showSpotifyPlayer();
+        startSpotifyPolling();
         return;
     }
     
@@ -607,13 +616,134 @@ function connectSpotify() {
 function initializeSpotifyPlayer() {
     if (!spotifyAccessToken) return;
     
-    // For demo purposes, show a mock player
+    // Initialize the player and start polling for currently playing track
     showSpotifyPlayer();
+    startSpotifyPolling();
+}
+
+function startSpotifyPolling() {
+    if (!spotifyAccessToken) return;
     
-    // In a real implementation, you would:
-    // 1. Load the Spotify Web Playback SDK
-    // 2. Initialize the player with the access token
-    // 3. Set up event listeners for playback state changes
+    // Clear any existing interval
+    stopSpotifyPolling();
+    
+    // Poll for currently playing track every 3 seconds
+    spotifyRefreshInterval = setInterval(() => {
+        getCurrentlyPlayingTrack();
+    }, 3000);
+    
+    // Get initial track info
+    getCurrentlyPlayingTrack();
+}
+
+function stopSpotifyPolling() {
+    if (spotifyRefreshInterval) {
+        clearInterval(spotifyRefreshInterval);
+        spotifyRefreshInterval = null;
+    }
+}
+
+async function getCurrentlyPlayingTrack() {
+    if (!spotifyAccessToken) return;
+    
+    try {
+        const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+            headers: {
+                'Authorization': `Bearer ${spotifyAccessToken}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            if (data.is_playing && data.item) {
+                // Update the display with currently playing track
+                updateSpotifyDisplay(data.item, data.is_playing, data.progress_ms);
+            } else {
+                // No track currently playing
+                updateSpotifyDisplay(null, false, 0);
+            }
+        } else if (response.status === 401) {
+            // Token expired, clear it
+            localStorage.removeItem('spotify_access_token');
+            spotifyAccessToken = null;
+            showSpotifyPlayer();
+            stopSpotifyPolling();
+        }
+    } catch (error) {
+        console.error('Error fetching currently playing track:', error);
+    }
+}
+
+function updateSpotifyDisplay(track, isPlaying, progressMs) {
+    const trackNameElement = document.getElementById('trackName');
+    const artistNameElement = document.getElementById('artistName');
+    const albumArtElement = document.getElementById('albumArt');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playPauseIcon = playPauseBtn.querySelector('i');
+    
+    if (track) {
+        // Update track info
+        trackNameElement.textContent = track.name;
+        artistNameElement.textContent = track.artists.map(artist => artist.name).join(', ');
+        
+        // Update album art
+        if (track.album && track.album.images && track.album.images.length > 0) {
+            albumArtElement.src = track.album.images[0].url;
+        } else {
+            albumArtElement.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
+        }
+        
+        // Update play/pause button
+        if (isPlaying) {
+            playPauseIcon.className = 'fas fa-pause';
+            playPauseBtn.title = 'Pause';
+        } else {
+            playPauseIcon.className = 'fas fa-play';
+            playPauseBtn.title = 'Play';
+        }
+        
+        // Add live indicator
+        const trackInfo = document.querySelector('.track-info');
+        if (trackInfo) {
+            // Remove existing live indicator
+            const existingIndicator = trackInfo.querySelector('.live-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+            
+            // Add new live indicator
+            const liveIndicator = document.createElement('div');
+            liveIndicator.className = 'live-indicator';
+            liveIndicator.style.fontSize = '12px';
+            liveIndicator.style.color = '#1DB954';
+            liveIndicator.style.marginTop = '5px';
+            liveIndicator.style.display = 'flex';
+            liveIndicator.style.alignItems = 'center';
+            liveIndicator.style.gap = '6px';
+            liveIndicator.innerHTML = `
+                <span style="width: 8px; height: 8px; background: #1DB954; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                <span>LIVE - Now Playing</span>
+            `;
+            trackInfo.appendChild(liveIndicator);
+        }
+    } else {
+        // No track playing
+        trackNameElement.textContent = 'No track playing';
+        artistNameElement.textContent = 'Connect your Spotify to see what you\'re listening to';
+        albumArtElement.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNjc3Njc2Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjNjc3Njc2Ii8+Cjwvc3ZnPgo=';
+        playPauseIcon.className = 'fas fa-play';
+        playPauseBtn.title = 'Play';
+        
+        // Remove live indicator
+        const trackInfo = document.querySelector('.track-info');
+        if (trackInfo) {
+            const existingIndicator = trackInfo.querySelector('.live-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        }
+    }
 }
 
 function showSpotifyPlayer() {
@@ -621,21 +751,8 @@ function showSpotifyPlayer() {
     document.getElementById('spotifyPlayer').style.display = 'block';
     
     if (spotifyAccessToken) {
-        // Show connected status
-        document.getElementById('trackName').textContent = 'Connected to Spotify';
-        document.getElementById('artistName').textContent = 'Your music is ready to play';
-        document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
-        
-        // Add connection status
-        const trackInfo = document.querySelector('.track-info');
-        if (trackInfo) {
-            const statusNote = document.createElement('div');
-            statusNote.style.fontSize = '12px';
-            statusNote.style.color = '#1DB954';
-            statusNote.style.marginTop = '5px';
-            statusNote.textContent = '✅ Connected - Use your Spotify app to control playback';
-            trackInfo.appendChild(statusNote);
-        }
+        // Show connected status and start polling
+        updateSpotifyDisplay(null, false, 0);
     } else {
         // Show not connected status
         document.getElementById('trackName').textContent = 'Not Connected';
@@ -645,40 +762,69 @@ function showSpotifyPlayer() {
 }
 
 function spotifyPlayPause() {
-    // Toggle play/pause button icon
-    const btn = document.getElementById('playPauseBtn');
-    const icon = btn.querySelector('i');
-    if (icon.classList.contains('fa-play')) {
-        icon.classList.remove('fa-play');
-        icon.classList.add('fa-pause');
-        document.getElementById('trackName').textContent = 'Now Playing - Bean Stash';
-    } else {
-        icon.classList.remove('fa-pause');
-        icon.classList.add('fa-play');
-        document.getElementById('trackName').textContent = 'Paused - Bean Stash';
-    }
+    if (!spotifyAccessToken) return;
+    
+    // Toggle play/pause using Spotify API
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const icon = playPauseBtn.querySelector('i');
+    const isCurrentlyPlaying = icon.classList.contains('fa-pause');
+    
+    const endpoint = isCurrentlyPlaying ? 'pause' : 'play';
+    
+    fetch(`https://api.spotify.com/v1/me/player/${endpoint}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${spotifyAccessToken}`
+        }
+    }).then(() => {
+        // Update will come from polling
+        setTimeout(() => getCurrentlyPlayingTrack(), 500);
+    }).catch(error => {
+        console.error('Error controlling playback:', error);
+    });
 }
 
 function spotifyPrevious() {
-    document.getElementById('trackName').textContent = 'Previous Track - Bean Stash';
-    document.getElementById('artistName').textContent = 'Hack Club AI';
+    if (!spotifyAccessToken) return;
+    
+    fetch('https://api.spotify.com/v1/me/player/previous', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${spotifyAccessToken}`
+        }
+    }).then(() => {
+        setTimeout(() => getCurrentlyPlayingTrack(), 500);
+    }).catch(error => {
+        console.error('Error skipping to previous track:', error);
+    });
 }
 
 function spotifyNext() {
-    document.getElementById('trackName').textContent = 'Next Track - Bean Stash';
-    document.getElementById('artistName').textContent = 'Hack Club AI';
+    if (!spotifyAccessToken) return;
+    
+    fetch('https://api.spotify.com/v1/me/player/next', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${spotifyAccessToken}`
+        }
+    }).then(() => {
+        setTimeout(() => getCurrentlyPlayingTrack(), 500);
+    }).catch(error => {
+        console.error('Error skipping to next track:', error);
+    });
 }
 
 function spotifyVolume(value) {
-    // Update volume display
-    const volumeDisplay = document.querySelector('.volume-control');
-    if (value > 50) {
-        volumeDisplay.innerHTML = '<i class="fas fa-volume-up"></i><input type="range" id="volumeSlider" min="0" max="100" value="' + value + '" onchange="spotifyVolume(this.value)"><i class="fas fa-volume-up"></i>';
-    } else if (value > 0) {
-        volumeDisplay.innerHTML = '<i class="fas fa-volume-down"></i><input type="range" id="volumeSlider" min="0" max="100" value="' + value + '" onchange="spotifyVolume(this.value)"><i class="fas fa-volume-down"></i>';
-    } else {
-        volumeDisplay.innerHTML = '<i class="fas fa-volume-mute"></i><input type="range" id="volumeSlider" min="0" max="100" value="' + value + '" onchange="spotifyVolume(this.value)"><i class="fas fa-volume-mute"></i>';
-    }
+    if (!spotifyAccessToken) return;
+    
+    fetch(`https://api.spotify.com/v1/me/player/volume?volume_percent=${value}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${spotifyAccessToken}`
+        }
+    }).catch(error => {
+        console.error('Error setting volume:', error);
+    });
 }
 
 // Study Timer

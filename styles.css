@@ -879,6 +879,7 @@ body {
     padding: 15px;
     background: rgba(29, 185, 84, 0.05);
     border-radius: 12px;
+    border: 1px solid rgba(29, 185, 84, 0.1);
 }
 
 .now-playing img {
@@ -886,6 +887,7 @@ body {
     height: 60px;
     border-radius: 8px;
     object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .track-info {
@@ -896,10 +898,11 @@ body {
     font-weight: 600;
     color: #6d5964;
     margin-bottom: 4px;
+    font-size: 14px;
 }
 
 .track-info div:last-child {
-    font-size: 14px;
+    font-size: 12px;
     color: #aa9496;
 }
 
@@ -949,6 +952,22 @@ body {
     border-radius: 50%;
     background: #1DB954;
     cursor: pointer;
+}
+
+/* Live indicator animation */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* Study Timer Styles */
