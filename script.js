@@ -588,40 +588,72 @@ function connectSpotify() {
         return;
     }
     
-    // For now, show a demo mode since OAuth requires a server
-    // In production, you would need a backend server to handle the authorization code flow
-    showSpotifyDemoMode();
+    // For now, let's use a simpler approach with a demo that shows how it would work
+    // In a real implementation, you would need a backend server or use a service like:
+    // - Netlify Functions
+    // - Vercel Functions
+    // - Firebase Functions
+    // - AWS Lambda
     
-    console.log('Spotify demo mode - OAuth requires server-side implementation for production');
+    showSpotifyDemoWithInstructions();
 }
 
-function showSpotifyDemoMode() {
+function showSpotifyLoading() {
     document.getElementById('spotifyLogin').style.display = 'none';
     document.getElementById('spotifyPlayer').style.display = 'block';
     
-    // Show demo mode with instructions
-    document.getElementById('trackName').textContent = 'Demo Mode - Spotify Integration';
-    document.getElementById('artistName').textContent = 'OAuth requires server implementation';
-    document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjNjc3Njc2Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjNjc3Njc2Ii8+Cjwvc3ZnPgo=';
+    // Show loading state
+    document.getElementById('trackName').textContent = 'Connecting to Spotify...';
+    document.getElementById('artistName').textContent = 'Please wait while we authenticate';
+    document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
     
-    // Add demo note
+    // Add loading animation
     const trackInfo = document.querySelector('.track-info');
     if (trackInfo) {
-        const demoNote = document.createElement('div');
-        demoNote.style.fontSize = '12px';
-        demoNote.style.color = '#1DB954';
-        demoNote.style.marginTop = '5px';
-        demoNote.style.padding = '8px';
-        demoNote.style.background = 'rgba(29, 185, 84, 0.1)';
-        demoNote.style.borderRadius = '6px';
-        demoNote.style.border = '1px solid rgba(29, 185, 84, 0.2)';
-        demoNote.innerHTML = `
-            <strong>Demo Mode</strong><br>
-            • Use the main music player (🎵 button) for sample tracks<br>
-            • Full Spotify integration requires server-side OAuth<br>
-            • Your Spotify app is properly configured!
+        const loadingNote = document.createElement('div');
+        loadingNote.style.fontSize = '12px';
+        loadingNote.style.color = '#1DB954';
+        loadingNote.style.marginTop = '5px';
+        loadingNote.style.textAlign = 'center';
+        loadingNote.innerHTML = `
+            <div style="display: inline-block; width: 20px; height: 20px; border: 2px solid #1DB954; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+            <span style="margin-left: 8px;">Authenticating...</span>
         `;
-        trackInfo.appendChild(demoNote);
+        trackInfo.appendChild(loadingNote);
+    }
+}
+
+function showSpotifyDemoWithInstructions() {
+    document.getElementById('spotifyLogin').style.display = 'none';
+    document.getElementById('spotifyPlayer').style.display = 'block';
+    
+    // Show demo with instructions
+    document.getElementById('trackName').textContent = 'Spotify Integration Ready';
+    document.getElementById('artistName').textContent = 'Your app is properly configured!';
+    document.getElementById('albumArt').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMURCODU0Ii8+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI4IiBmaWxsPSIjMURCODU0Ii8+Cjwvc3ZnPgo=';
+    
+    // Add detailed instructions
+    const trackInfo = document.querySelector('.track-info');
+    if (trackInfo) {
+        const instructionsNote = document.createElement('div');
+        instructionsNote.style.fontSize = '12px';
+        instructionsNote.style.color = '#1DB954';
+        instructionsNote.style.marginTop = '5px';
+        instructionsNote.style.padding = '12px';
+        instructionsNote.style.background = 'rgba(29, 185, 84, 0.1)';
+        instructionsNote.style.borderRadius = '8px';
+        instructionsNote.style.border = '1px solid rgba(29, 185, 84, 0.2)';
+        instructionsNote.innerHTML = `
+            <strong>✅ Your Spotify App is Ready!</strong><br><br>
+            <strong>Client ID:</strong> 29acee31192b49e8a7bc0f3e846e46bf<br>
+            <strong>Redirect URI:</strong> https://bernininini.github.io/CHATTY-BEAN/callback.html<br><br>
+            <strong>To enable full OAuth:</strong><br>
+            • Deploy a simple backend (Node.js/Python)<br>
+            • Use your Client Secret: 45c8ea53b09e460095b1b16d7c9118ae<br>
+            • Handle authorization code flow<br><br>
+            <strong>Current Status:</strong> Demo mode with sample tracks
+        `;
+        trackInfo.appendChild(instructionsNote);
     }
 }
 
